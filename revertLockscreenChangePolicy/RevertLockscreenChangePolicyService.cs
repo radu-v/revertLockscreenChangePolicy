@@ -48,12 +48,12 @@ namespace revertLockscreenChangePolicy
             var regKey = Registry.LocalMachine.OpenSubKey(SoftwarePoliciesMicrosoftWindowsPersonalization,
                 RegistryKeyPermissionCheck.ReadWriteSubTree);
 
-            if (regKey != null)
-            {
-                regKey.SetValue("NoChangingLockScreen", 0);
-                regKey.DeleteValue("NoChangingLockScreen");
-                regKey.Close();
-            }
+            var value = regKey?.GetValue("NoChangingLockScreen", null);
+            if (value == null || value is int i && i == 0) return;
+
+            regKey.SetValue("NoChangingLockScreen", 0);
+            regKey.DeleteValue("NoChangingLockScreen");
+            regKey.Close();
         }
     }
 }
