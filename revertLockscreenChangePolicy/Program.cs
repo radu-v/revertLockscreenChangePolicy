@@ -13,7 +13,6 @@ namespace revertLockscreenChangePolicy
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainUnhandledException;
 
-
             if (System.Environment.UserInteractive)
             {
                 switch (string.Concat(args))

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ServiceProcess;
+using System.Threading;
 using Microsoft.Win32;
 using RegistryUtils;
 
@@ -10,6 +11,7 @@ namespace revertLockscreenChangePolicy
         const string SoftwarePoliciesMicrosoftWindowsPersonalization = "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization";
 
         readonly RegistryMonitor monitor;
+        Timer timer;
 
         public RevertLockscreenChangePolicyService()
         {
@@ -23,7 +25,8 @@ namespace revertLockscreenChangePolicy
         {
             try
             {
-                OnRegChanged(this, null);
+                timer = new Timer(_ => OnRegChanged(null, null), null, 0, 300000);
+                //OnRegChanged(this, null);
             }
             catch
             {
@@ -35,6 +38,7 @@ namespace revertLockscreenChangePolicy
 
         protected override void OnStop()
         {
+            timer.Dispose();
             monitor?.Stop();
             monitor?.Dispose();
         }
@@ -47,6 +51,7 @@ namespace revertLockscreenChangePolicy
             if (regKey != null)
             {
                 regKey.SetValue("NoChangingLockScreen", 0);
+                regKey.DeleteValue("NoChangingLockScreen");
                 regKey.Close();
             }
         }
